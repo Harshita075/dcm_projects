@@ -1,0 +1,48 @@
+manifest_version: 2
+type: DCM_PROJECT
+
+#---------------------------------------------
+# 1. TARGETS: Where the code is deployed
+#---------------------------------------------
+default_target: DCM_DEV
+
+targets:
+  DCM_DEV:
+    account_identifier: RVPZZET-PQ28526  # Replace with your DEV account
+    project_name: DCM_DEV_DB.RAW.sales_Dev
+    project_owner: DCM_DEVELOPER                      
+    templating_config: DEV
+
+  DCM_UAT:
+    account_identifier: RVPZZET-PQ28526     # Replace with your UAT account
+    project_name:  DCM_UAT_DB.RAW.sales_Uat
+    project_owner: DCM_UAT_DEPLOYER                  
+    templating_config: UAT
+
+  DCM_PROD:
+    account_identifier: RVPZZET-PQ28526    # Replace with your PROD account
+    project_name: DCM_PROD_DB.RAW.sales_Prod
+    project_owner: DCM_PROD_DEPLOYER                  
+    templating_config: PROD
+
+#---------------------------------------------
+# 2. TEMPLATING: The variables passed to your SQL
+#---------------------------------------------
+templating:
+  defaults:
+    wh_size: "X-SMALL"
+
+  configurations:
+    DEV:
+      env_suffix: "_DEV"
+      project_owner_role: "DCM_DEVELOPER"
+
+    UAT:
+      env_suffix: "_UAT"
+      wh_size: "SMALL"       # Slightly larger than DEV for realistic testing
+      project_owner_role: "DCM_UAT_DEPLOYER"
+
+    PROD:
+      env_suffix: ""         # Prod objects won't have a suffix (e.g., just DB_ANALYTICS)
+      wh_size: "LARGE"       # Prod uses a bigger warehouse 
+      project_owner_role: "DCM_PROD_DEPLOYER"
