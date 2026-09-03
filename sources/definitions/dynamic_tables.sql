@@ -12,7 +12,7 @@
 
 DEFINE DYNAMIC TABLE SALES{{env_suffix}}_DB.ANALYTICS.DAILY_SALES_SUMMARY
 WAREHOUSE = SALES_WH{{env_suffix}}
-TARGET_LAG = '00:01:00'  -- 5 minutes
+TARGET_LAG = '1 minute'  -- 5 minutes
 INITIALIZE = 'ON_SCHEDULE'
 DATA_METRIC_SCHEDULE = 'TRIGGER_ON_CHANGES'
 COMMENT = 'Declarative daily sales rollup - auto-refreshes as SALES_ORDERS changes'
