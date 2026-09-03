@@ -26,4 +26,4 @@ jobs:
           if [[ "${{ github.base_ref }}" == "main" ]]; then echo "TARGET=DCM_PROD" >> $GITHUB_ENV; fi
           
       - name: Run DCM Plan
-        run: snow dcm plan --target $TARGET
+        run: snow dcm plan --target $TARGET --temporary-connection
