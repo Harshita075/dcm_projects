@@ -8,6 +8,9 @@ env:
   SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
   SNOWFLAKE_USER: ${{ secrets.SF_USER }}
   SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
+  SNOWFLAKE_CONNECTIONS_DEFAULT_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+  SNOWFLAKE_CONNECTIONS_DEFAULT_USER: ${{ secrets.SF_USER }}
+  SNOWFLAKE_CONNECTIONS_DEFAULT_PASSWORD: ${{ secrets.SF_PASSWORD }}
 jobs:
   deploy:
     name: Execute Deploy
