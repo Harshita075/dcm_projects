@@ -1,9 +1,37 @@
 -- ============================================================
 -- 02_tables.sql
--- Raw landing table for sales order data.
--- CHANGE_TRACKING is required so downstream dynamic tables and
--- data metric functions can react to inserts/updates automatically.
+-- Raw landing tables for the sales pipeline, plus the target
+-- table for the PROCEDURE-driven refresh pattern.
+--
+-- CUSTOMERS and PRODUCTS are dimension tables: low-frequency
+-- reference data, loaded once (or on a slow cadence) and joined
+-- into the fact table. Unlike SALES_ORDERS, they deliberately do
+-- NOT have CHANGE_TRACKING or a DATA_METRIC_SCHEDULE - not every
+-- table needs to be reactive, only the ones driving refreshes.
+--
+-- SALES_ORDERS has CHANGE_TRACKING = TRUE so downstream dynamic
+-- tables and data metric functions can react to inserts/updates
+-- automatically.
 -- ============================================================
+
+DEFINE TABLE SALES{{env_suffix}}_DB.RAW.CUSTOMERS (
+    customer_id       NUMBER            COMMENT 'Unique customer identifier',
+    customer_name     VARCHAR           COMMENT 'Customer display name',
+    segment           VARCHAR           COMMENT 'e.g. Enterprise, SMB, Consumer',
+    signup_date       DATE              COMMENT 'Date customer first signed up',
+    region            VARCHAR           COMMENT 'Customer home region',
+    loaded_at         TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP() COMMENT 'Ingestion timestamp'
+)
+COMMENT = 'Customer dimension - slowly changing, loaded once per demo run';
+
+DEFINE TABLE SALES{{env_suffix}}_DB.RAW.PRODUCTS (
+    product_id        NUMBER            COMMENT 'Unique product identifier',
+    product_name      VARCHAR           COMMENT 'Product display name',
+    category          VARCHAR           COMMENT 'e.g. Electronics, Apparel, Home',
+    unit_cost         NUMBER(10,2)      COMMENT 'Cost basis, used for margin calc',
+    loaded_at         TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP() COMMENT 'Ingestion timestamp'
+)
+COMMENT = 'Product dimension - slowly changing, loaded once per demo run';
 
 DEFINE TABLE SALES{{env_suffix}}_DB.RAW.SALES_ORDERS (
     order_id        NUMBER            COMMENT 'Unique order identifier',
@@ -35,4 +63,3 @@ DEFINE TABLE SALES{{env_suffix}}_DB.ANALYTICS.DAILY_SALES_SUMMARY_PROC (
     refreshed_at    TIMESTAMP_LTZ   COMMENT 'When this row was last (re)computed'
 )
 COMMENT = 'Daily sales rollup populated by the SALES_REFRESH procedure';
-
