@@ -35,7 +35,7 @@ jobs:
       - name: Trigger Metric Evaluation
         run: |
           echo "Testing dynamic table on ${ENV_SUFFIX} environment..."
-          snow sql -q "ALTER DYNAMIC TABLE SALES${ENV_SUFFIX}_DB.ANALYTICS.DAILY_SALES_SUMMARY REFRESH;"
+          snow sql -q "ALTER DYNAMIC TABLE SALES${ENV_SUFFIX}_DB.ANALYTICS.DAILY_SALES_SUMMARY REFRESH;" --temporary-connection
 
           # ==========================================
       # ADD THE NOTIFICATION STEP HERE (At the very end)
