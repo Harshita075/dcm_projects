@@ -60,7 +60,6 @@ DEFINE TABLE SALES{{env_suffix}}_DB.ANALYTICS.DAILY_SALES_SUMMARY_PROC (
     summary_date    DATE            COMMENT 'Day being summarized',
     region          VARCHAR         COMMENT 'Sales region',
     total_orders    NUMBER          COMMENT 'Distinct order count for the day/region',
-    total_revenue   NUMBER(18,2)    COMMENT 'Total revenue for the day/region',
-    refreshed_at    TIMESTAMP_LTZ   COMMENT 'When this row was last (re)computed'
+    total_revenue   NUMBER(18,2)    COMMENT 'Total revenue for the day/region'
 )
-COMMENT = 'Daily sales rollup populated by the SALES_REFRESH procedure';
+COMMENT = 'Daily sales rollup populated by the SALES_REFRESH dure';
