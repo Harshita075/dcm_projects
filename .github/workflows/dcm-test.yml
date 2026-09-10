@@ -6,10 +6,12 @@ on:
     types:
       - completed
     branches: [dev, uat, main]
+
 env:
   SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
   SNOWFLAKE_USER: ${{ secrets.SF_USER }}
   SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
+
 jobs:
   test:
     name: Execute Post-Deploy Tests
@@ -18,9 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-python@v5
         with: { python-version: '3.10' }
-      - run: pip install snowflake-cli-labs
+        
+      - name: Install Snowflake CLI
+        run: pip install snowflake-cli-labs
 
       - name: Determine Environment Suffix
         run: |
@@ -30,23 +35,39 @@ jobs:
           if [[ "$BRANCH" == "uat" ]]; then echo "ENV_SUFFIX=_UAT" >> $GITHUB_ENV; fi
           if [[ "$BRANCH" == "main" ]]; then echo "ENV_SUFFIX=" >> $GITHUB_ENV; fi
 
-      - name: Trigger Metric Evaluation
+      - name: Execute All DMF Tests
         run: |
-          echo "Testing dynamic table on ${ENV_SUFFIX} environment..."
-          snow sql -q "ALTER DYNAMIC TABLE SALES${ENV_SUFFIX}_DB.ANALYTICS.DAILY_SALES_SUMMARY REFRESH;" --temporary-connection
+          echo "Running all Data Metric Function tests on ${ENV_SUFFIX} environment..."
+          
+          # Enable nullglob so the loop doesn't fail if the tests directory is empty
+          shopt -s nullglob
+          
+          # Loop through every SQL file in the tests directory
+          for test_file in tests/*.sql; do
+            echo "------------------------------------------------"
+            echo "Executing Test: $test_file"
+            
+            # Execute the SQL file. 
+            # We pass the ENV_SUFFIX as a variable so your SQL can dynamically target the right database.
+            snow sql -f "$test_file" --variable "env_suffix=${ENV_SUFFIX}" --temporary-connection
+            
+            # Capture the exit code of the snow sql command
+            if [ $? -ne 0 ]; then
+              echo "❌ Test failed: $test_file"
+              exit 1
+            fi
+          done
+          echo "✅ All tests completed successfully."
 
-          # ==========================================
-      # ADD THE NOTIFICATION STEP HERE (At the very end)
-      # ==========================================
       - name: Send Email on Failure
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com # Replace with your SMTP server address
-          server_port: 465               # Common port for SSL
+          server_address: smtp.gmail.com 
+          server_port: 465                
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: ❌ Snowflake DCM Pipeline Failed
-          body: A failure occurred in the Snowflake DCM pipeline. Please review the GitHub Actions logs.
-          to: your-team@domain.com       # The email address receiving the alert
+          body: A failure occurred during the testing phase of the Snowflake DCM pipeline. Please review the GitHub Actions logs.
+          to: your-team@domain.com       
           from: GitHub Actions
