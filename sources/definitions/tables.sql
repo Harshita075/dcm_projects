@@ -63,3 +63,4 @@ DEFINE TABLE SALES{{env_suffix}}_DB.ANALYTICS.DAILY_SALES_SUMMARY_PROC (
     total_revenue   NUMBER(18,2)    COMMENT 'Total revenue for the day/region'
 )
 COMMENT = 'Daily sales rollup populated by the SALES_REFRESH dure';
+-- addition of new line
