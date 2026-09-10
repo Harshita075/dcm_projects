@@ -64,3 +64,4 @@ DEFINE TABLE SALES{{env_suffix}}_DB.ANALYTICS.DAILY_SALES_SUMMARY_PROC (
 )
 COMMENT = 'Daily sales rollup populated by the SALES_REFRESH dure';
 -- just a trial
+-- addition of new line
