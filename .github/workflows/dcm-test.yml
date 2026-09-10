@@ -27,37 +27,18 @@ jobs:
       - name: Install Snowflake CLI
         run: pip install snowflake-cli-labs
 
-      - name: Determine Environment Suffix
+      - name: Determine Target
         run: |
           # Use the branch that triggered the Deploy workflow
           BRANCH="${{ github.event.workflow_run.head_branch }}"
-          if [[ "$BRANCH" == "dev" ]]; then echo "ENV_SUFFIX=_DEV" >> $GITHUB_ENV; fi
-          if [[ "$BRANCH" == "uat" ]]; then echo "ENV_SUFFIX=_UAT" >> $GITHUB_ENV; fi
-          if [[ "$BRANCH" == "main" ]]; then echo "ENV_SUFFIX=" >> $GITHUB_ENV; fi
+          if [[ "$BRANCH" == "dev" ]]; then echo "TARGET=DCM_DEV" >> $GITHUB_ENV; fi
+          if [[ "$BRANCH" == "uat" ]]; then echo "TARGET=DCM_UAT" >> $GITHUB_ENV; fi
+          if [[ "$BRANCH" == "main" ]]; then echo "TARGET=DCM_PROD" >> $GITHUB_ENV; fi
 
-      - name: Execute All DMF Tests
+      - name: Run DCM Test
         run: |
-          echo "Running all Data Metric Function tests on ${ENV_SUFFIX} environment..."
-          
-          # Enable nullglob so the loop doesn't fail if the tests directory is empty
-          shopt -s nullglob
-          
-          # Loop through every SQL file in the tests directory
-          for test_file in tests/*.sql; do
-            echo "------------------------------------------------"
-            echo "Executing Test: $test_file"
-            
-            # Execute the SQL file. 
-            # We pass the ENV_SUFFIX as a variable so your SQL can dynamically target the right database.
-            snow sql -f "$test_file" --variable "env_suffix=${ENV_SUFFIX}" --temporary-connection
-            
-            # Capture the exit code of the snow sql command
-            if [ $? -ne 0 ]; then
-              echo "❌ Test failed: $test_file"
-              exit 1
-            fi
-          done
-          echo "✅ All tests completed successfully."
+          echo "Executing snow dcm test against $TARGET..."
+          snow dcm test --target $TARGET --temporary-connection
 
       - name: Send Email on Failure
         if: failure()
