@@ -49,7 +49,7 @@ CHANGE_TRACKING = TRUE
 DATA_METRIC_SCHEDULE = 'TRIGGER_ON_CHANGES'
 COMMENT = 'Raw landing table for sales order data';
 
-DEFINE TABLE SALES{{env_suffix}}_DB.RAW.PAYMENTS (
+DEFINE TABLE SALES{{env_suffix}}_DB.RAW.PAYMENT (
     payment_id      NUMBER            COMMENT 'Unique payment identifier',
     order_id        NUMBER            COMMENT 'Order associated with the payment',
     payment_date    DATE              COMMENT 'Date the payment was processed',
