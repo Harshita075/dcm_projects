@@ -49,6 +49,19 @@ CHANGE_TRACKING = TRUE
 DATA_METRIC_SCHEDULE = 'TRIGGER_ON_CHANGES'
 COMMENT = 'Raw landing table for sales order data';
 
+DEFINE TABLE SALES{{env_suffix}}_DB.RAW.PAYMENTS (
+    payment_id      NUMBER            COMMENT 'Unique payment identifier',
+    order_id        NUMBER            COMMENT 'Order associated with the payment',
+    payment_date    DATE              COMMENT 'Date the payment was processed',
+    payment_method  VARCHAR           COMMENT 'e.g. Card, Bank Transfer, Wallet',
+    payment_status  VARCHAR           COMMENT 'e.g. Pending, Completed, Failed, Refunded',
+    amount          NUMBER(18,2)      COMMENT 'Payment amount',
+    currency        VARCHAR           COMMENT 'ISO currency code',
+    loaded_at       TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP() COMMENT 'Ingestion timestamp',
+    custom_attributes VARIANT         COMMENT 'Optional JSON blob for additional payment attributes'
+)
+COMMENT = 'Payment transactions associated with sales orders';
+
 -- ------------------------------------------------------------
 -- Target table for the PROCEDURE-driven refresh pattern
 -- (populated by SALES_REFRESH in 03_procedures.sql, on a
