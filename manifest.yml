@@ -7,6 +7,12 @@ type: DCM_PROJECT
 default_target: DCM_DEV
 
 targets:
+  DCM_DEV:
+    account_identifier: RVPZZET-PQ28526  # Replace with your DEV account
+    project_name: DCM_DEV_DB.RAW.sales_Dev
+    project_owner: DCM_DEVELOPER                      
+    templating_config: DEV
+
   DCM_UAT:
     account_identifier: RVPZZET-PQ28526     # Replace with your UAT account
     project_name:  DCM_UAT_DB.RAW.sales_Uat
