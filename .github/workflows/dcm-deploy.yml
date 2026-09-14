@@ -29,3 +29,6 @@ jobs:
           
       - name: Run DCM Deploy
         run: snow dcm deploy --target $TARGET --temporary-connection
+        # check
+        # check2
+        
