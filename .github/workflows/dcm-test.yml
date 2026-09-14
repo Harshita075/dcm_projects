@@ -2,7 +2,7 @@ name: Snowflake DCM - Test
 
 on:
   workflow_run:
-    workflows: ["Snowflake DCM - Deploy"]
+    workflows: ["Snowflake DCM - Plan, Snowflake DCM - Deploy"]
     types:
       - completed
     branches: [dev, uat, main]
