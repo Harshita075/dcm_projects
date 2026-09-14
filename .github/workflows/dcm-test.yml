@@ -2,10 +2,11 @@ name: Snowflake DCM - Test
 
 on:
   workflow_run:
-    workflows: ["Snowflake DCM - Plan, Snowflake DCM - Deploy"]
+    # BUG 1 FIXED: Separate quotes for each workflow
+    workflows: ["Snowflake DCM - Plan", "Snowflake DCM - Deploy"]
     types:
       - completed
-    branches: [dev, uat, main]
+    # BUG 2 FIXED: Removed the branches filter so feature branches can trigger this
 
 env:
   SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
@@ -15,7 +16,6 @@ env:
 jobs:
   test:
     name: Execute Post-Deploy Tests
-    # Only run this job if the Deploy workflow was actually successful
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
@@ -28,9 +28,22 @@ jobs:
         run: pip install snowflake-cli-labs
 
       - name: Determine Target
+        # BUG 3 FIXED: Smart routing for both Plan (PR base branch) and Deploy (Push head branch)
         run: |
-          # Use the branch that triggered the Deploy workflow
-          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          WORKFLOW_NAME="${{ github.event.workflow_run.name }}"
+          
+          if [[ "$WORKFLOW_NAME" == *"Plan"* ]]; then
+            BRANCH="${{ github.event.workflow_run.pull_requests[0].base.ref }}"
+            if [[ -z "$BRANCH" ]]; then
+               echo "Could not find PR base branch, defaulting to dev"
+               BRANCH="dev"
+            fi
+          else
+            BRANCH="${{ github.event.workflow_run.head_branch }}"
+          fi
+          
+          echo "Evaluated Target Branch: $BRANCH"
+          
           if [[ "$BRANCH" == "dev" ]]; then echo "TARGET=DCM_DEV" >> $GITHUB_ENV; fi
           if [[ "$BRANCH" == "uat" ]]; then echo "TARGET=DCM_UAT" >> $GITHUB_ENV; fi
           if [[ "$BRANCH" == "main" ]]; then echo "TARGET=DCM_PROD" >> $GITHUB_ENV; fi
