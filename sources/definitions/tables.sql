@@ -21,7 +21,7 @@ DEFINE TABLE SALES{{env_suffix}}_DB.RAW.CUSTOMERS (
     signup_date       DATE              COMMENT 'Date customer first signed up',
     region            VARCHAR           COMMENT 'Customer home region',
     loaded_at         TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP() COMMENT 'Ingestion timestamp',
-    custom_attributes VARIANT  COMMENT 'Optional JSON blob for additional customer attributes'
+    custom_attributes VARIANT  COMMENT ' JSON blob for additional customer attributes'
 )
 COMMENT = 'Customer dimension - slowly changing, loaded once per demo run';
 
@@ -49,6 +49,19 @@ CHANGE_TRACKING = TRUE
 DATA_METRIC_SCHEDULE = 'TRIGGER_ON_CHANGES'
 COMMENT = 'Raw landing table for sales order data';
 
+DEFINE TABLE SALES{{env_suffix}}_DB.RAW.PAYMENT (
+    payment_id      NUMBER            COMMENT 'Unique payment identifier',
+    order_id        NUMBER            COMMENT 'Order associated with the payment',
+    payment_date    DATE              COMMENT 'Date the payment was processed',
+    payment_method  VARCHAR           COMMENT 'e.g. Card, Bank Transfer, Wallet',
+    payment_status  VARCHAR           COMMENT 'e.g. Pending, Completed, Failed, Refunded',
+    amount          NUMBER(18,2)      COMMENT 'Payment amount',
+    currency        VARCHAR           COMMENT 'ISO currency code',
+    loaded_at       TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP() COMMENT 'Ingestion timestamp',
+    custom_attributes VARIANT         COMMENT 'Optional JSON blob for additional payment attributes'
+)
+COMMENT = 'Payment transactions associated with sales orders';
+
 -- ------------------------------------------------------------
 -- Target table for the PROCEDURE-driven refresh pattern
 -- (populated by SALES_REFRESH in 03_procedures.sql, on a
@@ -58,10 +71,11 @@ COMMENT = 'Raw landing table for sales order data';
 -- ------------------------------------------------------------
 DEFINE TABLE SALES{{env_suffix}}_DB.ANALYTICS.DAILY_SALES_SUMMARY_PROC (
     summary_date    DATE            COMMENT 'Day being summarized',
-    region          VARCHAR         COMMENT 'Sales region',
+    region          VARCHAR         COMMENT 'Sales region define',
     total_orders    NUMBER          COMMENT 'Distinct order count for the day/region',
     total_revenue   NUMBER(18,2)    COMMENT 'Total revenue for the day/region'
 )
 COMMENT = 'Daily sales rollup populated by the SALES_REFRESH dure';
 -- just a trial
 -- addition of new line
+-- hey is 

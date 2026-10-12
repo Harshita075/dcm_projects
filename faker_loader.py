@@ -38,25 +38,33 @@ def main():
     if args.customers > 0:
         print(f"Generating {args.customers} customers...")
         for _ in range(args.customers):
-            # Example logic for customers
             name = fake.name().replace("'", "")
-            cursor.execute(f"INSERT INTO RAW_CUSTOMERS (name, signup_date) VALUES ('{name}', '{fake.date_this_year()}')")
-
+            customer_id = fake.random_int(min=1, max=999999)
+            
+            cursor.execute(f"""
+                INSERT INTO RAW.CUSTOMERS (customer_id, customer_name, signup_date) 
+                VALUES ({customer_id}, '{name}', '{fake.date_this_year()}')
+            """)
+            
     if args.products > 0:
         print(f"Generating {args.products} product sales...")
         for _ in range(args.products):
             if args.mode == 'bad_data':
-                # Deliberately inject bad data for testing
+                # Deliberately inject bad data for testing DMFs
                 revenue = round(random.uniform(-500.0, -10.0), 2) # Negative revenue
                 orders = "NULL"
+                region = "NULL" # Missing region
             else:
                 # Seed good data
                 revenue = round(random.uniform(10.0, 500.0), 2)
                 orders = fake.random_int(min=1, max=10)
+                region = f"'{fake.random_element(elements=('North', 'South', 'East', 'West'))}'"
 
+            # Insert into the actual summary table defined in your SQL file
             cursor.execute(f"""
-                INSERT INTO RAW_SALES (total_orders, total_revenue, report_date) 
-                VALUES ({orders}, {revenue}, '{fake.date_this_month()}')
+                INSERT INTO ANALYTICS.DAILY_SALES_SUMMARY_PROC 
+                (summary_date, region, total_orders, total_revenue) 
+                VALUES ('{fake.date_this_month()}', {region}, {orders}, {revenue})
             """)
 
     conn.commit()
