@@ -21,7 +21,7 @@ DEFINE TABLE SALES{{env_suffix}}_DB.RAW.CUSTOMERS (
     signup_date       DATE              COMMENT 'Date customer first signed up',
     region            VARCHAR           COMMENT 'Customer home region',
     loaded_at         TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP() COMMENT 'Ingestion timestamp',
-    custom_attributes VARIANT  COMMENT 'Optional JSON blob for additional customer attributes'
+    custom_attributes VARIANT  COMMENT ' JSON blob for additional customer attributes'
 )
 COMMENT = 'Customer dimension - slowly changing, loaded once per demo run';
 
@@ -71,7 +71,7 @@ COMMENT = 'Payment transactions associated with sales orders';
 -- ------------------------------------------------------------
 DEFINE TABLE SALES{{env_suffix}}_DB.ANALYTICS.DAILY_SALES_SUMMARY_PROC (
     summary_date    DATE            COMMENT 'Day being summarized',
-    region          VARCHAR         COMMENT 'Sales region defined',
+    region          VARCHAR         COMMENT 'Sales region define',
     total_orders    NUMBER          COMMENT 'Distinct order count for the day/region',
     total_revenue   NUMBER(18,2)    COMMENT 'Total revenue for the day/region'
 )
